@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 const links = [
   { href: '#about', label: 'About' },
@@ -13,75 +13,100 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', onScroll)
-    return () => window.removeEventListener('scroll', onScroll)
+    const fn = () => setScrolled(window.scrollY > 12)
+    window.addEventListener('scroll', fn)
+    return () => window.removeEventListener('scroll', fn)
   }, [])
 
   return (
-    <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
-      <div className="container nav-inner">
-        <a href="#" className="logo" onClick={() => setOpen(false)}>
-          <span className="logo-icon">⚡</span>
-          <span className="logo-text">BluHExH</span>
+    <header className={`hf-nav ${scrolled ? 'on' : ''}`}>
+      <div className="container hf-nav-in">
+        <a href="#" className="hf-logo" onClick={() => setOpen(false)}>
+          <span className="hf-logo-mark">⚡</span>
+          <span>BluHExH</span>
         </a>
-        <div className={`nav-links ${open ? 'open' : ''}`}>
+
+        <nav className={`hf-links ${open ? 'open' : ''}`}>
           {links.map((l) => (
-            <a key={l.href} href={l.href} className="nav-link" onClick={() => setOpen(false)}>{l.label}</a>
+            <a key={l.href} href={l.href} onClick={() => setOpen(false)}>{l.label}</a>
           ))}
-          <a href="https://github.com/BluHExH" target="_blank" rel="noopener noreferrer" className="btn btn-primary nav-cta mobile-only">GitHub</a>
-        </div>
-        <div className="nav-right">
-          <a href="https://github.com/BluHExH" target="_blank" rel="noopener noreferrer" className="btn btn-primary nav-cta desktop-only">GitHub</a>
-          <button className={`hamburger ${open ? 'open' : ''}`} onClick={() => setOpen(!open)} aria-label="Menu">
+        </nav>
+
+        <div className="hf-nav-right">
+          <a className="hf-nav-cta" href="https://github.com/BluHExH" target="_blank" rel="noopener noreferrer">
+            GitHub
+          </a>
+          <button className={`hf-burg ${open ? 'open' : ''}`} onClick={() => setOpen(!open)} aria-label="Menu">
             <span /><span /><span />
           </button>
         </div>
       </div>
+
       <style>{`
-        .navbar {
-          position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-          background: rgba(250, 250, 249, 0.7);
-          backdrop-filter: blur(16px);
+        .hf-nav {
+          position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+          background: rgba(250,250,249,0.75);
+          backdrop-filter: blur(14px);
           border-bottom: 1px solid transparent;
-          transition: all 0.25s ease;
+          transition: background .2s, border-color .2s, box-shadow .2s;
         }
-        .navbar.scrolled {
-          background: rgba(255, 255, 255, 0.9);
-          border-bottom-color: var(--border);
-          box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+        .hf-nav.on {
+          background: rgba(255,255,255,0.92);
+          border-bottom-color: #ECECE8;
+          box-shadow: 0 1px 0 rgba(0,0,0,0.03);
         }
-        .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
-        .logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 17px; z-index: 2; }
-        .logo-icon {
-          width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
-          background: var(--accent); color: #fff; border-radius: 8px; font-size: 14px;
+        .hf-nav-in {
+          height: 64px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
         }
-        .nav-links { display: flex; align-items: center; gap: 28px; }
-        .nav-link { font-size: 14px; font-weight: 500; color: var(--text-secondary); transition: color 0.15s; }
-        .nav-link:hover { color: var(--text); }
-        .nav-right { display: flex; align-items: center; gap: 10px; }
-        .nav-cta { padding: 8px 16px; font-size: 14px; }
-        .mobile-only { display: none; }
-        .hamburger { display: none; flex-direction: column; gap: 5px; width: 28px; padding: 4px; }
-        .hamburger span { display: block; height: 2px; background: var(--text); border-radius: 1px; transition: all 0.25s; }
-        .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
-        .hamburger.open span:nth-child(2) { opacity: 0; }
-        .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+        .hf-logo {
+          display: flex; align-items: center; gap: 8px;
+          font-weight: 700; font-size: 16px; z-index: 2;
+        }
+        .hf-logo-mark {
+          width: 28px; height: 28px;
+          display: grid; place-items: center;
+          background: #FF5A1F; color: #fff;
+          border-radius: 8px; font-size: 13px;
+        }
+        .hf-links { display: flex; gap: 28px; }
+        .hf-links a {
+          font-size: 14px; font-weight: 500; color: #5C5C5C;
+        }
+        .hf-links a:hover { color: #0F0F0F; }
+        .hf-nav-right { display: flex; align-items: center; gap: 10px; }
+        .hf-nav-cta {
+          background: #FF5A1F; color: #fff;
+          font-size: 14px; font-weight: 600;
+          padding: 8px 16px; border-radius: 8px;
+        }
+        .hf-nav-cta:hover { background: #E84E15; }
+        .hf-burg {
+          display: none; flex-direction: column; gap: 5px; width: 28px; padding: 4px;
+        }
+        .hf-burg span {
+          display: block; height: 2px; background: #0F0F0F; border-radius: 1px;
+          transition: .2s;
+        }
+        .hf-burg.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+        .hf-burg.open span:nth-child(2) { opacity: 0; }
+        .hf-burg.open span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
         @media (max-width: 800px) {
-          .desktop-only { display: none; }
-          .mobile-only { display: inline-flex; }
-          .hamburger { display: flex; }
-          .nav-links {
-            position: fixed; inset: 0; top: 64px;
-            background: rgba(255,255,255,0.98);
-            flex-direction: column; justify-content: flex-start; padding-top: 40px; gap: 24px;
-            opacity: 0; pointer-events: none; transition: opacity 0.25s;
+          .hf-burg { display: flex; }
+          .hf-nav-cta { display: none; }
+          .hf-links {
+            position: fixed; left: 0; right: 0; top: 64px; bottom: 0;
+            background: #fff;
+            flex-direction: column; align-items: center; justify-content: flex-start;
+            padding-top: 40px; gap: 22px;
+            opacity: 0; pointer-events: none; transition: opacity .2s;
           }
-          .nav-links.open { opacity: 1; pointer-events: auto; }
-          .nav-link { font-size: 18px; }
+          .hf-links.open { opacity: 1; pointer-events: auto; }
+          .hf-links a { font-size: 18px; }
         }
       `}</style>
-    </nav>
+    </header>
   )
 }
