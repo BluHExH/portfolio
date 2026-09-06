@@ -1,16 +1,18 @@
 :root {
-  --bg: #FAFAF9;
-  --surface: #FFFFFF;
-  --text: #0F0F0F;
-  --text-secondary: #5C5C5C;
-  --text-muted: #8A8A8A;
+  --bg: #0B0B0C;
+  --bg-elevated: #121214;
+  --surface: #161618;
+  --surface-2: #1C1C1F;
+  --text: #F4F4F2;
+  --text-secondary: #A1A1A0;
+  --text-muted: #6B6B6A;
   --accent: #FF5A1F;
-  --accent-hover: #E84E15;
-  --accent-soft: rgba(255, 90, 31, 0.12);
-  --border: #E8E8E6;
-  --border-strong: #D4D4D0;
-  --shadow: 0 20px 50px rgba(15, 15, 15, 0.08);
-  --shadow-sm: 0 8px 24px rgba(15, 15, 15, 0.06);
+  --accent-hover: #FF6D38;
+  --accent-soft: rgba(255, 90, 31, 0.14);
+  --border: #262628;
+  --border-strong: #343438;
+  --shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+  --shadow-sm: 0 8px 24px rgba(0, 0, 0, 0.35);
   --font: Inter, system-ui, -apple-system, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, monospace;
   --radius: 16px;
@@ -47,6 +49,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   letter-spacing: -0.03em;
   line-height: 1.15;
   margin-bottom: 12px;
+  color: var(--text);
 }
 .section-desc {
   color: var(--text-secondary);
@@ -68,15 +71,15 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .btn-primary {
   background: var(--accent);
   color: #fff;
-  box-shadow: 0 4px 14px rgba(255, 90, 31, 0.3);
+  box-shadow: 0 4px 18px rgba(255, 90, 31, 0.35);
 }
 .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
 .btn-secondary {
-  background: #fff;
+  background: transparent;
   color: var(--text);
   border: 1px solid var(--border-strong);
 }
-.btn-secondary:hover { border-color: #aaa; transform: translateY(-1px); }
+.btn-secondary:hover { border-color: var(--text-muted); transform: translateY(-1px); }
 
 .card {
   background: var(--surface);
@@ -84,10 +87,11 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   border-radius: var(--radius);
   padding: 24px;
   box-shadow: var(--shadow-sm);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 .card:hover {
   transform: translateY(-3px);
+  border-color: var(--border-strong);
   box-shadow: var(--shadow);
 }
 
@@ -114,5 +118,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .stagger.visible > *:nth-child(6) { transition-delay: 0.3s; opacity: 1; transform: none; }
 
 ::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #444; }
 ::selection { background: var(--accent); color: #fff; }
