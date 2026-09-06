@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useInView } from '../hooks/useInView'
 import { useCountUp } from '../hooks/useCountUp'
 
@@ -11,21 +11,32 @@ type GhUser = {
   created_at: string
   avatar_url: string
   bio: string | null
+  name: string | null
+  html_url: string
 }
 
-type Activity = {
-  id: string
-  type: string
-  repo: string
-  date: string
-  detail: string
+type Activity = { id: string; type: string; repo: string; date: string; detail: string }
+type LangRow = { name: string; bytes: number; pct: number }
+
+const LANG_COLORS: Record<string, string> = {
+  Python: '#3572A5',
+  TypeScript: '#3178C6',
+  JavaScript: '#F1E05A',
+  HTML: '#E34C26',
+  CSS: '#563D7C',
+  Shell: '#89E051',
+  C: '#555555',
+  'C++': '#F34B7D',
+  Java: '#B07219',
+  Go: '#00ADD8',
+  Rust: '#DEA584',
 }
 
-function StatCard({ label, value, suffix, active }: { label: string; value: number; suffix?: string; active: boolean }) {
+function StatCard({ label, value, active }: { label: string; value: number; active: boolean }) {
   const n = useCountUp(value, active, 1400)
   return (
     <div className="stat-card card">
-      <div className="stat-num">{n}{suffix || ''}</div>
+      <div className="stat-num">{n}</div>
       <div className="stat-label">{label}</div>
     </div>
   )
@@ -53,14 +64,17 @@ function formatEvent(e: any): Activity | null {
     case 'PublicEvent':
       return { id, type: 'Public', repo, date, detail: 'Made repository public' }
     default:
-      return { id, type: e.type.replace('Event', ''), repo, date, detail: e.type.replace('Event', '') }
+      return { id, type: String(e.type || 'Event').replace('Event', ''), repo, date, detail: String(e.type || '').replace('Event', '') }
   }
 }
 
 export default function Stats() {
-  const { ref, inView } = useInView(0.15)
+  const { ref, inView } = useInView(0.12)
   const [user, setUser] = useState<GhUser | null>(null)
   const [stars, setStars] = useState(0)
+  const [forks, setForks] = useState(0)
+  const [langs, setLangs] = useState<LangRow[]>([])
+  const [topRepos, setTopRepos] = useState<{ name: string; stars: number; lang: string; url: string }[]>([])
   const [activity, setActivity] = useState<Activity[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -72,18 +86,38 @@ export default function Stats() {
         const [uRes, rRes, eRes] = await Promise.all([
           fetch(`https://api.github.com/users/${USER}`),
           fetch(`https://api.github.com/users/${USER}/repos?per_page=100&sort=updated`),
-          fetch(`https://api.github.com/users/${USER}/events/public?per_page=12`),
+          fetch(`https://api.github.com/users/${USER}/events/public?per_page=15`),
         ])
         if (!uRes.ok) throw new Error('user')
         const u: GhUser = await uRes.json()
-        const repos = rRes.ok ? await rRes.json() : []
-        const events = eRes.ok ? await eRes.json() : []
-        const totalStars = Array.isArray(repos)
-          ? repos.reduce((s: number, r: any) => s + (r.stargazers_count || 0), 0)
-          : 0
-        const acts = (Array.isArray(events) ? events : [])
-          .map(formatEvent)
-          .filter(Boolean) as Activity[]
+        const repos: any[] = rRes.ok ? await rRes.json() : []
+        const events: any[] = eRes.ok ? await eRes.json() : []
+
+        const own = Array.isArray(repos) ? repos.filter((r) => !r.fork) : []
+        const totalStars = own.reduce((s, r) => s + (r.stargazers_count || 0), 0)
+        const totalForks = own.reduce((s, r) => s + (r.forks_count || 0), 0)
+
+        const langMap: Record<string, number> = {}
+        for (const r of own) {
+          if (r.language) langMap[r.language] = (langMap[r.language] || 0) + 1
+        }
+        const langTotal = Object.values(langMap).reduce((a, b) => a + b, 0) || 1
+        const langRows = Object.entries(langMap)
+          .map(([name, bytes]) => ({ name, bytes, pct: (bytes / langTotal) * 100 }))
+          .sort((a, b) => b.bytes - a.bytes)
+          .slice(0, 6)
+
+        const tops = [...own]
+          .sort((a, b) => (b.stargazers_count || 0) - (a.stargazers_count || 0))
+          .slice(0, 5)
+          .map((r) => ({
+            name: r.name,
+            stars: r.stargazers_count || 0,
+            lang: r.language || 'Code',
+            url: r.html_url,
+          }))
+
+        const acts = events.map(formatEvent).filter(Boolean) as Activity[]
         const seen = new Set<string>()
         const unique: Activity[] = []
         for (const a of acts) {
@@ -93,9 +127,13 @@ export default function Stats() {
           unique.push(a)
           if (unique.length >= 8) break
         }
+
         if (!cancelled) {
           setUser(u)
           setStars(totalStars)
+          setForks(totalForks)
+          setLangs(langRows)
+          setTopRepos(tops)
           setActivity(unique)
         }
       } catch {
@@ -110,62 +148,97 @@ export default function Stats() {
 
   const years = user
     ? Math.max(1, new Date().getFullYear() - new Date(user.created_at).getFullYear())
-    : 2
+    : 1
 
-  const cards = [
-    { label: 'Public repos', value: user?.public_repos ?? 66, suffix: '' },
-    { label: 'Total stars', value: stars, suffix: '' },
-    { label: 'Followers', value: user?.followers ?? 0, suffix: '' },
-    { label: 'Years on GitHub', value: years, suffix: '' },
-  ]
+  const cards = useMemo(() => [
+    { label: 'Public repos', value: user?.public_repos ?? 0 },
+    { label: 'Total stars', value: stars },
+    { label: 'Followers', value: user?.followers ?? 0 },
+    { label: 'Years on GitHub', value: years },
+  ], [user, stars, years])
 
   return (
     <section id="stats" className="section gh-stats" ref={ref}>
       <div className="container">
-        <p className={`section-label reveal ${inView ? 'visible' : ''}`}>GitHub · Live</p>
+        <p className={`section-label reveal ${inView ? 'visible' : ''}`}>GitHub · Live API</p>
         <h2 className={`section-title reveal reveal-delay-1 ${inView ? 'visible' : ''}`}>Stats & activity</h2>
         <p className={`section-desc reveal reveal-delay-2 ${inView ? 'visible' : ''}`}>
-          Live data from github.com/{USER} — updates when you ship.
+          Custom dashboard powered by the GitHub API — no third-party image cards.
         </p>
 
         <div className={`stats-grid stagger ${inView ? 'visible' : ''}`}>
           {cards.map((s) => (
-            <StatCard key={s.label} {...s} active={inView && !loading} />
+            <StatCard key={s.label} label={s.label} value={s.value} active={inView && !loading} />
           ))}
         </div>
 
         <div className={`gh-panels stagger ${inView ? 'visible' : ''}`}>
-          <div className="card gh-cards">
-            <h3 className="panel-title">Profile stats</h3>
-            <div className="gh-img-wrap">
-              <img
-                src={`https://github-profile-summary-cards.vercel.app/api/cards/stats?username=${USER}&theme=github_dark`}
-                alt="GitHub stats"
-                loading="lazy"
-              />
-              <img
-                src={`https://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=${USER}&theme=github_dark`}
-                alt="Repos per language"
-                loading="lazy"
-              />
-              <img
-                src={`https://github-profile-summary-cards.vercel.app/api/cards/most-commit-language?username=${USER}&theme=github_dark`}
-                alt="Most commit language"
-                loading="lazy"
-              />
+          <div className="card panel">
+            <div className="profile-row">
+              {user?.avatar_url && (
+                <img className="avatar" src={user.avatar_url} alt={USER} width={56} height={56} />
+              )}
+              <div>
+                <h3 className="panel-title tight">{user?.name || USER}</h3>
+                <p className="profile-bio">{user?.bio || 'Open source · Security · Builder'}</p>
+                <a className="gh-link" href={`https://github.com/${USER}`} target="_blank" rel="noopener noreferrer">
+                  github.com/{USER} →
+                </a>
+              </div>
             </div>
-            <a className="gh-link" href={`https://github.com/${USER}`} target="_blank" rel="noopener noreferrer">
-              Open GitHub profile →
-            </a>
+            <div className="mini-grid">
+              <div className="mini"><span className="mini-n">{user?.following ?? 0}</span><span className="mini-l">Following</span></div>
+              <div className="mini"><span className="mini-n">{forks}</span><span className="mini-l">Forks</span></div>
+              <div className="mini"><span className="mini-n">{langs.length}</span><span className="mini-l">Languages</span></div>
+              <div className="mini"><span className="mini-n">{stars}</span><span className="mini-l">Stars</span></div>
+            </div>
           </div>
 
-          <div className="card gh-activity">
-            <div className="activity-head">
-              <h3 className="panel-title">Recent activity</h3>
-              <span className="live-dot" title="Public events" />
+          <div className="card panel">
+            <h3 className="panel-title">Top languages</h3>
+            {loading && <p className="muted">Loading…</p>}
+            {!loading && langs.length === 0 && <p className="muted">No language data</p>}
+            <div className="lang-list">
+              {langs.map((l) => (
+                <div key={l.name} className="lang-row">
+                  <div className="lang-head">
+                    <span className="lang-dot" style={{ background: LANG_COLORS[l.name] || '#FF5A1F' }} />
+                    <span className="lang-name">{l.name}</span>
+                    <span className="lang-pct">{l.pct.toFixed(1)}%</span>
+                  </div>
+                  <div className="lang-bar">
+                    <i style={{ width: `${l.pct}%`, background: LANG_COLORS[l.name] || '#FF5A1F' }} />
+                  </div>
+                </div>
+              ))}
             </div>
-            {loading && <p className="activity-empty">Loading activity…</p>}
-            {error && !loading && <p className="activity-empty">Could not load activity right now.</p>}
+          </div>
+
+          <div className="card panel">
+            <h3 className="panel-title">Top repositories</h3>
+            <ul className="repo-list">
+              {topRepos.map((r) => (
+                <li key={r.name}>
+                  <a href={r.url} target="_blank" rel="noopener noreferrer" className="repo-link">
+                    <span className="repo-name">{r.name}</span>
+                    <span className="repo-meta">
+                      <span>{r.lang}</span>
+                      <span>★ {r.stars}</span>
+                    </span>
+                  </a>
+                </li>
+              ))}
+              {!loading && topRepos.length === 0 && <li className="muted">No repos found</li>}
+            </ul>
+          </div>
+
+          <div className="card panel">
+            <div className="activity-head">
+              <h3 className="panel-title tight">Recent activity</h3>
+              <span className="live-dot" />
+            </div>
+            {loading && <p className="muted">Loading activity…</p>}
+            {error && !loading && <p className="muted">Could not load GitHub data right now.</p>}
             {!loading && !error && (
               <ul className="activity-list">
                 {activity.map((a) => (
@@ -189,14 +262,6 @@ export default function Stats() {
             )}
           </div>
         </div>
-
-        <div className={`gh-streak reveal reveal-delay-3 ${inView ? 'visible' : ''}`}>
-          <img
-            src={`https://streak-stats.demolab.com/?user=${USER}&theme=dark&background=161618&ring=FF5A1F&fire=FF5A1F&currStreakLabel=FF5A1F&sideLabels=A1A1A0&currStreakNum=F4F4F2&sideNums=D8D8D5&dates=6B6B6A&hide_border=true&border_radius=12`}
-            alt="GitHub streak"
-            loading="lazy"
-          />
-        </div>
       </div>
 
       <style>{`
@@ -204,20 +269,39 @@ export default function Stats() {
         .stat-card { text-align: center; padding: 28px 16px; }
         .stat-num { font-size: clamp(32px, 4vw, 42px); font-weight: 800; color: var(--accent); letter-spacing: -0.03em; line-height: 1; margin-bottom: 8px; }
         .stat-label { font-size: 13px; font-weight: 500; color: var(--text-muted); }
-        .gh-panels { display: grid; grid-template-columns: 1.15fr 1fr; gap: 16px; margin-top: 20px; }
-        .panel-title { font-size: 14px; font-weight: 700; margin-bottom: 14px; color: var(--text); }
-        .gh-img-wrap { display: flex; flex-direction: column; gap: 12px; }
-        .gh-img-wrap img { width: 100%; height: auto; border-radius: 12px; display: block; }
-        .gh-link { display: inline-block; margin-top: 14px; font-size: 13px; font-weight: 600; color: var(--accent); }
+        .gh-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+        .panel { padding: 22px; }
+        .panel-title { font-size: 15px; font-weight: 700; margin-bottom: 14px; color: var(--text); }
+        .panel-title.tight { margin-bottom: 6px; }
+        .profile-row { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 18px; }
+        .avatar { width: 56px; height: 56px; border-radius: 14px; border: 1px solid var(--border); }
+        .profile-bio { font-size: 13px; color: var(--text-secondary); margin: 4px 0 8px; line-height: 1.5; }
+        .gh-link { font-size: 13px; font-weight: 600; color: var(--accent); }
         .gh-link:hover { text-decoration: underline; }
-        .activity-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+        .mini-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .mini { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; padding: 12px 8px; text-align: center; }
+        .mini-n { display: block; font-size: 18px; font-weight: 800; color: var(--text); }
+        .mini-l { font-size: 11px; color: var(--text-muted); }
+        .lang-list { display: flex; flex-direction: column; gap: 12px; }
+        .lang-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .lang-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .lang-name { font-size: 13px; font-weight: 600; color: var(--text); }
+        .lang-pct { margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--text-muted); }
+        .lang-bar { height: 6px; background: #262628; border-radius: 99px; overflow: hidden; }
+        .lang-bar i { display: block; height: 100%; border-radius: 99px; transition: width 0.8s ease; }
+        .repo-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .repo-link { display: flex; justify-content: space-between; gap: 12px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.02); transition: border-color 0.2s; }
+        .repo-link:hover { border-color: var(--accent); }
+        .repo-name { font-size: 13px; font-weight: 600; color: var(--text); }
+        .repo-meta { display: flex; gap: 12px; font-size: 12px; color: var(--text-muted); }
+        .activity-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
         .live-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ADE80; animation: livePulse 2s infinite; }
         @keyframes livePulse {
-          0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.45); }
-          70% { box-shadow: 0 0 0 8px rgba(74, 222, 128, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+          0% { box-shadow: 0 0 0 0 rgba(74,222,128,0.45); }
+          70% { box-shadow: 0 0 0 8px rgba(74,222,128,0); }
+          100% { box-shadow: 0 0 0 0 rgba(74,222,128,0); }
         }
-        .activity-list { list-style: none; display: flex; flex-direction: column; gap: 10px; max-height: 340px; overflow-y: auto; }
+        .activity-list { list-style: none; display: flex; flex-direction: column; max-height: 280px; overflow-y: auto; }
         .activity-item { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: start; padding: 10px 0; border-bottom: 1px solid var(--border); }
         .activity-item:last-child { border-bottom: none; }
         .badge { font-family: var(--mono); font-size: 10px; font-weight: 600; text-transform: uppercase; padding: 3px 7px; border-radius: 6px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
@@ -229,11 +313,12 @@ export default function Stats() {
         .activity-repo:hover { color: var(--accent); }
         .activity-detail { display: block; font-size: 12px; color: var(--text-muted); margin-top: 2px; }
         .activity-date { font-family: var(--mono); font-size: 11px; color: var(--text-muted); white-space: nowrap; }
-        .activity-empty { font-size: 13px; color: var(--text-muted); padding: 20px 0; }
-        .gh-streak { margin-top: 20px; text-align: center; }
-        .gh-streak img { max-width: 100%; height: auto; border-radius: 12px; }
+        .muted { font-size: 13px; color: var(--text-muted); }
         @media (max-width: 900px) { .gh-panels { grid-template-columns: 1fr; } }
-        @media (max-width: 768px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 768px) {
+          .stats-grid { grid-template-columns: repeat(2, 1fr); }
+          .mini-grid { grid-template-columns: repeat(2, 1fr); }
+        }
       `}</style>
     </section>
   )
