@@ -1,22 +1,19 @@
 import { useInView } from '../hooks/useInView'
 
 const timeline = [
-  { year: '2024–Now', title: 'Open Source & Security Tools', desc: 'Building pentest toolkits, LocalVulnAI, exploit research utilities. Active GitHub contributor focused on practical security software.' },
-  { year: '2025–2026', title: 'LocalVulnAI & MediaForge', desc: 'Shipped offline AI vulnerability scanner with Ollama and started long-term FFmpeg-based multimedia framework work.' },
-  { year: '2024–2025', title: 'Termux Security Suite', desc: 'Hex-pentest, number-to-location, brute-force utilities designed for mobile red-team workflows on Android.' },
-  { year: 'Ongoing', title: 'Community & Learning', desc: 'Exploring new stacks, mentoring juniors, and shipping educational content around security and open source.' },
+  { year: '2024–Now', title: 'Open source & security tools', desc: 'Building pentest toolkits, LocalVulnAI, exploit research utilities. Active GitHub contributor.' },
+  { year: '2025–2026', title: 'LocalVulnAI & MediaForge', desc: 'Shipped offline AI vulnerability scanner with Ollama and started FFmpeg-based multimedia framework work.' },
+  { year: '2024–2025', title: 'Termux security suite', desc: 'Hex-pentest, number-to-location, and related utilities for mobile red-team workflows.' },
+  { year: 'Ongoing', title: 'Community & learning', desc: 'Exploring new stacks and shipping practical open source software.' },
 ]
 
 export default function Experience() {
   const { ref, inView } = useInView(0.15)
   return (
-    <section id="experience" className="section experience" ref={ref}>
+    <section id="experience" className="section" ref={ref}>
       <div className="container">
-        <p className={`section-label reveal ${inView ? 'visible' : ''}`}>// JOURNEY</p>
-        <h2 className={`section-title reveal reveal-delay-1 ${inView ? 'visible' : ''}`}>Path So Far</h2>
-        <p className={`section-desc reveal reveal-delay-2 ${inView ? 'visible' : ''}`}>
-          From first scripts to shipping tools people actually use.
-        </p>
+        <p className={`section-label reveal ${inView ? 'visible' : ''}`}>Journey</p>
+        <h2 className={`section-title reveal reveal-delay-1 ${inView ? 'visible' : ''}`}>Path so far</h2>
         <div className={`timeline stagger ${inView ? 'visible' : ''}`}>
           {timeline.map((t, i) => (
             <div key={i} className="timeline-item">
@@ -31,15 +28,14 @@ export default function Experience() {
         </div>
       </div>
       <style>{`
-        .timeline { margin-top: 48px; position: relative; padding-left: 28px; }
-        .timeline::before { content: ""; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 1px; background: linear-gradient(to bottom, var(--accent), var(--border-subtle)); }
-        .timeline-item { position: relative; margin-bottom: 20px; }
-        .timeline-marker { position: absolute; left: -28px; top: 22px; width: 11px; height: 11px; border-radius: 50%; background: var(--bg-void); border: 2px solid var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
-        .timeline-content { padding: 22px 24px; transition: border-color 0.25s, transform 0.25s; }
-        .timeline-content:hover { border-color: var(--accent); transform: translateX(4px); }
-        .timeline-year { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; color: var(--accent); }
-        .timeline-title { font-family: var(--font-display); font-size: 22px; font-weight: 600; margin: 6px 0 8px; }
-        .timeline-desc { color: var(--text-secondary); font-size: 14px; line-height: 1.65; }
+        .timeline { margin-top: 40px; position: relative; padding-left: 28px; }
+        .timeline::before { content: ""; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(to bottom, var(--accent), var(--border)); border-radius: 2px; }
+        .timeline-item { position: relative; margin-bottom: 16px; }
+        .timeline-marker { position: absolute; left: -28px; top: 24px; width: 12px; height: 12px; border-radius: 50%; background: #fff; border: 3px solid var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+        .timeline-content { padding: 20px 22px; }
+        .timeline-year { font-size: 12px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em; }
+        .timeline-title { font-size: 18px; font-weight: 700; margin: 4px 0 6px; letter-spacing: -0.02em; }
+        .timeline-desc { color: var(--text-secondary); font-size: 14px; line-height: 1.6; }
       `}</style>
     </section>
   )
