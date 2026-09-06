@@ -139,13 +139,18 @@ export default function Stats() {
             <h3 className="panel-title">Profile stats</h3>
             <div className="gh-img-wrap">
               <img
-                src={`https://github-readme-stats.vercel.app/api?username=${USER}&show_icons=true&theme=github_dark&bg_color=161618&title_color=FF5A1F&icon_color=FF5A1F&text_color=D8D8D5&hide_border=true&border_radius=12`}
+                src={`https://github-profile-summary-cards.vercel.app/api/cards/stats?username=${USER}&theme=github_dark`}
                 alt="GitHub stats"
                 loading="lazy"
               />
               <img
-                src={`https://github-readme-stats.vercel.app/api/top-langs/?username=${USER}&layout=compact&theme=github_dark&bg_color=161618&title_color=FF5A1F&text_color=D8D8D5&hide_border=true&border_radius=12`}
-                alt="Top languages"
+                src={`https://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=${USER}&theme=github_dark`}
+                alt="Repos per language"
+                loading="lazy"
+              />
+              <img
+                src={`https://github-profile-summary-cards.vercel.app/api/cards/most-commit-language?username=${USER}&theme=github_dark`}
+                alt="Most commit language"
                 loading="lazy"
               />
             </div>
@@ -187,7 +192,7 @@ export default function Stats() {
 
         <div className={`gh-streak reveal reveal-delay-3 ${inView ? 'visible' : ''}`}>
           <img
-            src={`https://github-readme-streak-stats.herokuapp.com/?user=${USER}&theme=dark&background=161618&ring=FF5A1F&fire=FF5A1F&currStreakLabel=FF5A1F&sideLabels=A1A1A0&currStreakNum=F4F4F2&sideNums=D8D8D5&dates=6B6B6A&hide_border=true&border_radius=12`}
+            src={`https://streak-stats.demolab.com/?user=${USER}&theme=dark&background=161618&ring=FF5A1F&fire=FF5A1F&currStreakLabel=FF5A1F&sideLabels=A1A1A0&currStreakNum=F4F4F2&sideNums=D8D8D5&dates=6B6B6A&hide_border=true&border_radius=12`}
             alt="GitHub streak"
             loading="lazy"
           />
