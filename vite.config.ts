@@ -1,8 +1,9 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
-// https://vite.dev/config/
+// Local / Vercel: '/'
+// GitHub Pages project site: '/portfolio/' (set via VITE_BASE in Actions)
 export default defineConfig({
   plugins: [react()],
-  base: '/', // Change to '/repo-name/' if deploying to username.github.io/repo-name
+  base: process.env.VITE_BASE || '/',
 })
