@@ -7,6 +7,15 @@ const items = [
   { label: 'Exploring', text: 'Practical OSINT helpers and Termux-first security workflows' },
 ]
 
+const css = `
+.now-inner { max-width: 900px; }
+.now-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 32px; }
+.now-card { padding: 18px 20px; }
+.now-label { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+.now-card p { margin: 0; font-size: 14px; color: var(--text-secondary); line-height: 1.55; }
+@media (max-width: 600px) { .now-grid { grid-template-columns: 1fr; } }
+`
+
 export default function Now() {
   const { ref, inView } = useInView(0.15)
   const vis = inView ? ' visible' : ''
@@ -31,12 +40,3 @@ export default function Now() {
     </section>
   )
 }
-
-const css = `
-.now-inner { max-width: 900px; }
-.now-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 32px; }
-.now-card { padding: 18px 20px; }
-.now-label { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
-.now-card p { margin: 0; font-size: 14px; color: var(--text-secondary); line-height: 1.55; }
-@media (max-width: 600px) { .now-grid { grid-template-columns: 1fr; } }
-`
