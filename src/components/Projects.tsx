@@ -1,321 +1,130 @@
-import { useEffect, useRef, useState } from 'react'
+import { useInView } from '../hooks/useInView'
 
 const projects = [
-  {
-    name: 'LocalVulnAI',
-    tag: 'AI / Security',
-    language: 'Python',
-    description:
-      'Local AI-powered vulnerability scanner using Ollama offline. Explains findings in plain language without sending code to the cloud.',
-    points: ['Runs fully offline', 'Human-readable fixes', 'Built for low-resource machines'],
-    url: 'https://github.com/BluHExH/LocalVulnAI',
-  },
-  {
-    name: 'Hex-pentest',
-    tag: 'Pentest',
-    language: 'Python',
-    description:
-      'EliteHex — a penetration testing toolkit designed for Termux on Android. Practical modules for real mobile workflows.',
-    points: ['Termux-first design', 'Practical red-team tools', 'Lightweight dependencies'],
-    url: 'https://github.com/BluHExH/Hex-pentest',
-  },
-  {
-    name: 'knitout-3d-visualizer',
-    tag: '3D / Web',
-    language: 'TypeScript',
-    description:
-      'Interactive 3D knitout visualizer with live code editing. See structure change as you type.',
-    points: ['Live 3D preview', 'Code-driven geometry', 'Deployed on Vercel'],
-    url: 'https://github.com/BluHExH/knitout-3d-visualizer',
-    demo: 'https://knitout-3d-viz.vercel.app',
-  },
-  {
-    name: 'HEX-Number-to-location',
-    tag: 'OSINT',
-    language: 'Python',
-    description:
-      'Number-to-location automation for OSINT-style lookups on Termux. Fast CLI path from input to insight.',
-    points: ['OSINT helper', 'Termux friendly', 'Automation focused'],
-    url: 'https://github.com/BluHExH/HEX-Number-to-location',
-  },
-  {
-    name: 'GitHub-Profile-Builder',
-    tag: 'AI / Platform',
-    language: 'TypeScript',
-    description:
-      'HEX Forge — AI-powered GitHub profile and README builder. Ship a sharper public presence faster.',
-    points: ['AI-assisted READMEs', 'Profile polish', 'Builder workflow'],
-    url: 'https://github.com/BluHExH/GitHub-Profile-Builder-Platform-',
-  },
+  { name: 'LocalVulnAI', description: 'Local AI-powered vulnerability scanner using Ollama offline.', language: 'Python', stars: 0, url: 'https://github.com/BluHExH/LocalVulnAI', tag: 'AI / Security' },
+  { name: 'Hex-pentest', description: 'EliteHex — penetration testing toolkit for Termux on Android.', language: 'Python', stars: 3, url: 'https://github.com/BluHExH/Hex-pentest', tag: 'Pentest' },
+  { name: 'HEX-Number-to-location', description: 'Number-to-location automation for OSINT-style lookups on Termux.', language: 'Python', stars: 3, url: 'https://github.com/BluHExH/HEX-Number-to-location', tag: 'OSINT' },
+  { name: 'HEX-exploit-maker', description: 'Exploit engine for research, red-team training, and payload analysis.', language: 'Python', stars: 2, url: 'https://github.com/BluHExH/HEX-exploit-maker', tag: 'Research' },
+  { name: 'knitout-3d-visualizer', description: 'Interactive 3D knitout visualizer with live code editing.', language: 'TypeScript', stars: 0, url: 'https://github.com/BluHExH/knitout-3d-visualizer', demo: 'https://knitout-3d-viz.vercel.app', tag: '3D / Web' },
+  { name: 'MediaForge', description: 'Open-source multimedia framework based on FFmpeg.', language: 'C / Python', stars: 0, url: 'https://github.com/BluHExH/MediaForge', tag: 'Multimedia' },
+  { name: 'portfolio', description: 'Personal developer portfolio — dark theme, animated sections.', language: 'TypeScript', stars: 0, url: 'https://github.com/BluHExH/portfolio', demo: 'https://bluhexx.github.io/portfolio/', tag: 'Web' },
+  { name: 'GitHub-Profile-Builder', description: 'HEX Forge — AI-powered GitHub profile and README builder platform.', language: 'TypeScript', stars: 0, url: 'https://github.com/BluHExH/GitHub-Profile-Builder-Platform-', tag: 'AI / Platform' },
 ]
 
+const css = `
+.projects-section { overflow: hidden; }
+.slider-wrap {
+  position: relative; margin-top: 40px; overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+}
+.slider-track {
+  display: flex; gap: 16px; width: max-content;
+  animation: slideLeft 40s linear infinite;
+}
+.slider-track:hover { animation-play-state: paused; }
+@keyframes slideLeft {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.slide-card {
+  flex: 0 0 300px; width: 300px; display: flex; flex-direction: column; gap: 10px;
+  padding: 22px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+.slide-card:hover {
+  border-color: var(--accent); transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(255, 90, 31, 0.12);
+}
+.slide-top { display: flex; justify-content: space-between; align-items: center; }
+.slide-tag { font-size: 11px; font-weight: 600; color: var(--accent); background: var(--accent-soft); padding: 4px 10px; border-radius: 999px; }
+.slide-stars { font-size: 12px; color: var(--text-muted); }
+.slide-name { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
+.slide-desc {
+  font-size: 13px; color: var(--text-secondary); line-height: 1.55; flex: 1;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.slide-foot {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 12px; border-top: 1px solid var(--border); margin-top: 4px;
+}
+.slide-lang { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+.slide-links { display: flex; gap: 12px; align-items: center; }
+.slide-demo {
+  font-size: 12px; font-weight: 700; color: #4ADE80;
+  border: 1px solid rgba(74,222,128,0.35); padding: 2px 8px; border-radius: 999px;
+}
+.slide-open { font-size: 12px; font-weight: 600; color: var(--accent); }
+.projects-cta { margin-top: 36px; text-align: center; }
+@media (max-width: 600px) {
+  .slide-card { flex-basis: 260px; width: 260px; }
+  .slider-track { animation-duration: 32s; }
+}
+`
+
+function ProjectCard({ p }: { p: (typeof projects)[0] & { demo?: string } }) {
+  return (
+    <div className="slide-card">
+      <div className="slide-top">
+        <span className="slide-tag">{p.tag}</span>
+        <span className="slide-stars">★ {p.stars}</span>
+      </div>
+      <h3 className="slide-name">{p.name}</h3>
+      <p className="slide-desc">{p.description}</p>
+      <div className="slide-foot">
+        <span className="slide-lang">{p.language}</span>
+        <span className="slide-links">
+          {p.demo && (
+            <a href={p.demo} target="_blank" rel="noopener noreferrer" className="slide-demo">
+              Live
+            </a>
+          )}
+          <a href={p.url} target="_blank" rel="noopener noreferrer" className="slide-open">
+            Code →
+          </a>
+        </span>
+      </div>
+    </div>
+  )
+}
+
 export default function Projects() {
-  const sectionRef = useRef<HTMLElement>(null)
-  const [index, setIndex] = useState(0)
-  const [progress, setProgress] = useState(0)
-
-  useEffect(() => {
-    const onScroll = () => {
-      const el = sectionRef.current
-      if (!el) return
-      const rect = el.getBoundingClientRect()
-      const total = el.offsetHeight - window.innerHeight
-      if (total <= 0) return
-      const scrolled = Math.min(Math.max(-rect.top, 0), total)
-      const p = scrolled / total
-      setProgress(p)
-      const i = Math.min(projects.length - 1, Math.floor(p * projects.length))
-      setIndex(i)
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    onScroll()
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  const p = projects[index]
+  const { ref, inView } = useInView(0.1)
+  const loop = [...projects, ...projects]
+  const vis = inView ? ' visible' : ''
 
   return (
-    <section id="projects" className="pin-section" ref={sectionRef}>
-      <div className="pin-sticky">
-        <div className="container pin-inner">
-          <div className="pin-head">
-            <p className="section-label">Projects</p>
-            <h2 className="section-title">Selected work</h2>
-            <p className="section-desc">
-              Scroll to move through 5 featured projects. After the last one, the page continues.
-            </p>
-          </div>
+    <section id="projects" className="section projects-section" ref={ref}>
+      <div className="container">
+        <p className={'section-label reveal' + vis}>Projects</p>
+        <h2 className={'section-title reveal reveal-delay-1' + vis}>Selected work</h2>
+        <p className={'section-desc reveal reveal-delay-2' + vis}>
+          Auto-scrolling showcase — hover any card to pause.
+        </p>
+      </div>
 
-          <div className="pin-stage">
-            <div className="pin-side">
-              <div className="pin-steps">
-                {projects.map((item, i) => (
-                  <button
-                    key={item.name}
-                    type="button"
-                    className={'pin-step' + (i === index ? ' active' : i < index ? ' done' : '')}
-                    onClick={() => {
-                      const el = sectionRef.current
-                      if (!el) return
-                      const total = el.offsetHeight - window.innerHeight
-                      const target = el.offsetTop + (i / projects.length) * total + 2
-                      window.scrollTo({ top: target, behavior: 'smooth' })
-                    }}
-                  >
-                    <span className="pin-num">{String(i + 1).padStart(2, '0')}</span>
-                    <span className="pin-step-name">{item.name}</span>
-                  </button>
-                ))}
-              </div>
-              <div className="pin-bar">
-                <i style={{ height: progress * 100 + '%' }} />
-              </div>
-            </div>
+      <div className={'slider-wrap reveal reveal-delay-2' + vis}>
+        <div className="slider-track">
+          {loop.map((p, idx) => (
+            <ProjectCard key={p.name + '-' + idx} p={p} />
+          ))}
+        </div>
+      </div>
 
-            <div className="pin-card" key={p.name}>
-              <div className="pin-card-top">
-                <span className="pin-tag">{p.tag}</span>
-                <span className="pin-lang">{p.language}</span>
-              </div>
-              <h3 className="pin-name">{p.name}</h3>
-              <p className="pin-desc">{p.description}</p>
-              <ul className="pin-points">
-                {p.points.map((pt) => (
-                  <li key={pt}>{pt}</li>
-                ))}
-              </ul>
-              <div className="pin-actions">
-                <a className="btn btn-primary" href={p.url} target="_blank" rel="noopener noreferrer">
-                  View on GitHub →
-                </a>
-                {p.demo && (
-                  <a className="btn btn-secondary" href={p.demo} target="_blank" rel="noopener noreferrer">
-                    Live demo
-                  </a>
-                )}
-              </div>
-              <p className="pin-count">
-                {index + 1} / {projects.length}
-              </p>
-            </div>
-          </div>
-
-          <div className="pin-cta">
-            <a
-              href="https://github.com/BluHExH?tab=repositories"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-secondary"
-            >
-              See all repositories →
-            </a>
-          </div>
+      <div className="container">
+        <div className={'projects-cta reveal reveal-delay-3' + vis}>
+          <a
+            href="https://github.com/BluHExH?tab=repositories"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-secondary"
+          >
+            See all repositories →
+          </a>
         </div>
       </div>
       <style>{css}</style>
     </section>
   )
 }
-
-const css = `
-.pin-section {
-  position: relative;
-  height: 500vh;
-}
-.pin-sticky {
-  position: sticky;
-  top: 0;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  padding: 100px 0 48px;
-  background: transparent;
-}
-.pin-inner { width: 100%; }
-.pin-head { margin-bottom: 28px; max-width: 560px; }
-.pin-stage {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 28px;
-  align-items: stretch;
-}
-.pin-side {
-  display: flex;
-  gap: 14px;
-  align-items: stretch;
-}
-.pin-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex: 1;
-}
-.pin-step {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-align: left;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  color: var(--text-muted);
-  transition: all 0.2s ease;
-}
-.pin-step:hover { color: var(--text); background: rgba(255,255,255,0.03); }
-.pin-step.active {
-  color: var(--text);
-  border-color: rgba(255, 90, 31, 0.35);
-  background: rgba(255, 90, 31, 0.08);
-}
-.pin-step.done { color: var(--text-secondary); }
-.pin-num {
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--accent);
-  min-width: 22px;
-}
-.pin-step-name {
-  font-size: 13px;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.pin-bar {
-  width: 3px;
-  border-radius: 99px;
-  background: #262628;
-  position: relative;
-  overflow: hidden;
-  min-height: 180px;
-}
-.pin-bar i {
-  position: absolute;
-  left: 0; top: 0; width: 100%;
-  background: linear-gradient(180deg, #FF5A1F, #FF9A5C);
-  border-radius: 99px;
-  transition: height 0.05s linear;
-}
-.pin-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 32px;
-  box-shadow: var(--shadow);
-  min-height: 340px;
-  display: flex;
-  flex-direction: column;
-  animation: pinIn 0.35s ease;
-}
-@keyframes pinIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: none; }
-}
-.pin-card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-.pin-tag {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--accent);
-  background: var(--accent-soft);
-  padding: 4px 10px;
-  border-radius: 999px;
-}
-.pin-lang {
-  font-size: 12px;
-  color: var(--text-muted);
-  font-weight: 500;
-}
-.pin-name {
-  font-size: clamp(28px, 4vw, 40px);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  margin: 0 0 14px;
-  color: var(--text);
-}
-.pin-desc {
-  font-size: 16px;
-  line-height: 1.7;
-  color: var(--text-secondary);
-  margin: 0 0 18px;
-  max-width: 520px;
-}
-.pin-points {
-  margin: 0 0 24px;
-  padding-left: 18px;
-  color: var(--text-secondary);
-  font-size: 14px;
-  line-height: 1.8;
-}
-.pin-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: auto;
-}
-.pin-count {
-  margin-top: 18px;
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--text-muted);
-  letter-spacing: 0.04em;
-}
-.pin-cta {
-  margin-top: 28px;
-  text-align: center;
-}
-@media (max-width: 800px) {
-  .pin-section { height: 420vh; }
-  .pin-stage { grid-template-columns: 1fr; }
-  .pin-side { order: 2; }
-  .pin-steps { flex-direction: row; flex-wrap: wrap; }
-  .pin-bar { display: none; }
-  .pin-card { min-height: 300px; padding: 24px; }
-  .pin-step-name { max-width: 120px; }
-}
-`
