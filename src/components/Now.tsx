@@ -13,8 +13,8 @@ export default function Now() {
     <section id="now" className="section" ref={ref}>
       <div className="container now-inner">
         <p className={`section-label reveal ${inView ? 'visible' : ''}`}>Now</p>
-        <h2 className={`section-title reveal reveal-delay-1 ${inView ? 'visible' : ''}`}>What I'm focused on</h2>
-        <p className={`section-desc reveal reveal-delay-2 ${inView ? 'visible' : ''}`}>
+        <h2 className={`section-title reveal reveal-delay-1 ${inView ? 'visible' : ''}`}>What I am focused on</h2>
+        <p className={`section-desc reveal reveal-delay-2 ${inView ? 'visible' : ''`}>
           A live snapshot of current work — updated as priorities shift.
         </p>
         <div className={`now-grid stagger ${inView ? 'visible' : ''`}>
