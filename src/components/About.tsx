@@ -1,4 +1,5 @@
 import { useInView } from '../hooks/useInView'
+import IdCard from './IdCard'
 
 export default function About() {
   const { ref, inView } = useInView(0.15)
@@ -17,24 +18,16 @@ export default function About() {
               <a href="mailto:cyber17official.bd@gmail.com" className="btn btn-secondary">Email me</a>
             </div>
           </div>
-          <div className={`about-cards stagger ${inView ? 'visible' : ''}`}>
-            <div className="card info-card"><span className="info-label">Focus</span><span className="info-value">Open source & security tools</span></div>
-            <div className="card info-card"><span className="info-label">Interests</span><span className="info-value">Pentesting · AI · Community</span></div>
-            <div className="card info-card"><span className="info-label">Style</span><span className="info-value">Python-first, practical tooling</span></div>
-            <div className="card info-card"><span className="info-label">Email</span><a href="mailto:cyber17official.bd@gmail.com" className="info-value link">cyber17official.bd@gmail.com</a></div>
+          <div className={`about-id reveal reveal-delay-3 ${inView ? 'visible' : ''}`}>
+            <IdCard />
           </div>
         </div>
       </div>
       <style>{`
-        .about-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 48px; margin-top: 36px; }
+        .about-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 40px; margin-top: 36px; align-items: center; }
         .about-text p { color: var(--text-secondary); margin-bottom: 14px; font-size: 16px; line-height: 1.75; }
         .about-text strong { color: var(--text); }
         .about-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
-        .about-cards { display: flex; flex-direction: column; gap: 12px; }
-        .info-card { display: flex; flex-direction: column; gap: 4px; }
-        .info-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); }
-        .info-value { font-size: 15px; color: var(--text); }
-        .info-value.link { color: var(--accent); }
         @media (max-width: 768px) { .about-grid { grid-template-columns: 1fr; } }
       `}</style>
     </section>
