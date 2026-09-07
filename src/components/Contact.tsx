@@ -1,4 +1,5 @@
-import { FormEvent, useState } from 'react'
+import { useState } from 'react'
+import type { FormEvent } from 'react'
 import { useInView } from '../hooks/useInView'
 
 const EMAIL = 'cyber17official.bd@gmail.com'
@@ -35,7 +36,7 @@ export default function Contact() {
           Collaboration, open source, security tools — or just say hi.
         </p>
 
-        <div className={`contact-grid reveal reveal-delay-2 ${inView ? 'visible' : ''}`}>
+        <div className={`contact-grid reveal reveal-delay-2 ${inView ? 'visible' : ''`}>
           <form className="card contact-form" onSubmit={onSubmit}>
             <input type="hidden" name="_subject" value="Portfolio contact — BluHExH" />
             <input type="hidden" name="_template" value="table" />
