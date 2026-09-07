@@ -78,14 +78,6 @@ export default function FeaturedScroll() {
     <section id="featured" className="pin-section" ref={sectionRef}>
       <div className="pin-sticky">
         <div className="container pin-inner">
-          <div className="pin-head">
-            <p className="section-label">Featured</p>
-            <h2 className="section-title">Deep dive</h2>
-            <p className="section-desc">
-              Scroll here — 5 projects stay in place and change one by one. After the last, the page continues.
-            </p>
-          </div>
-
           <div className="pin-stage">
             <div className="pin-side">
               <div className="pin-steps">
@@ -157,11 +149,10 @@ const css = `
   min-height: 100vh;
   display: flex;
   align-items: center;
-  padding: 100px 0 48px;
+  padding: 80px 0 48px;
   background: transparent;
 }
 .pin-inner { width: 100%; }
-.pin-head { margin-bottom: 28px; max-width: 560px; }
 .pin-stage {
   display: grid;
   grid-template-columns: 220px 1fr;
