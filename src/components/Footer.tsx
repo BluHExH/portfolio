@@ -11,8 +11,8 @@ export default function Footer() {
         >
           BluHExH
         </a>
-        <p className="footer-handle">@BluHExH · GitHub</p>
-        <p className="footer-quote">Stay curious. Break systems. Build better ones.</p>
+        <p className="footer-handle">github.com/BluHExH</p>
+        <p className="footer-quote">Built in public. Fixed in public.</p>
         <div className="footer-links">
           <a href="https://github.com/BluHExH" target="_blank" rel="noopener noreferrer">
             GitHub
@@ -20,7 +20,7 @@ export default function Footer() {
           <a href="mailto:cyber17official.bd@gmail.com">Email</a>
           <a href="#projects">Projects</a>
         </div>
-        <p className="footer-copy">© {new Date().getFullYear()} BluHExH</p>
+        <p className="footer-copy">© {new Date().getFullYear()} · still learning</p>
       </div>
       <style>{css}</style>
     </footer>
@@ -38,43 +38,38 @@ const css = `
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   text-align: center;
 }
 .footer-giant {
   font-family: Inter, system-ui, sans-serif;
-  font-size: clamp(56px, 14vw, 140px);
+  font-size: clamp(52px, 13vw, 120px);
   font-weight: 800;
   letter-spacing: -0.06em;
   line-height: 0.9;
-  background: linear-gradient(180deg, #F4F4F2 0%, #F4F4F2 40%, rgba(244,244,242,0.15) 100%);
+  background: linear-gradient(180deg, #F4F4F2 0%, #F4F4F2 40%, rgba(244,244,242,0.12) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  transition: filter 0.3s ease, transform 0.3s ease;
-  user-select: none;
+  transition: filter 0.3s ease;
 }
 .footer-giant:hover {
-  filter: drop-shadow(0 0 40px rgba(255, 90, 31, 0.35));
-  transform: scale(1.02);
+  filter: drop-shadow(0 0 36px rgba(255, 90, 31, 0.3));
 }
 .footer-handle {
   font-family: var(--mono);
   font-size: 13px;
   font-weight: 500;
   color: var(--accent);
-  letter-spacing: 0.04em;
-  margin-top: 4px;
 }
 .footer-quote {
   font-size: 14px;
   color: var(--text-muted);
-  max-width: 360px;
 }
 .footer-links {
   display: flex;
   gap: 24px;
-  margin: 8px 0 4px;
+  margin: 6px 0 2px;
 }
 .footer-links a {
   font-size: 14px;

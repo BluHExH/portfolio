@@ -3,29 +3,33 @@ import { useEffect, useRef, useState } from 'react'
 const projects = [
   {
     name: 'LocalVulnAI',
-    tag: 'AI / Security',
+    tag: 'offline first',
     language: 'Python',
     description:
-      'Local AI-powered vulnerability scanner using Ollama offline. Explains findings in plain language without sending code to the cloud.',
-    points: ['Runs fully offline', 'Human-readable fixes', 'Built for low-resource machines'],
+      'I got tired of scanners that need an API key and a cloud bill. LocalVulnAI runs with Ollama on your machine and talks like a human, not a CVE dump.',
+    points: [
+      'Built because I needed it on low-end hardware',
+      'No code leaves the machine',
+      'Still rough edges — that is the point of shipping',
+    ],
     url: 'https://github.com/BluHExH/LocalVulnAI',
   },
   {
     name: 'Hex-pentest',
-    tag: 'Pentest',
+    tag: 'Termux',
     language: 'Python',
     description:
-      'EliteHex — a penetration testing toolkit designed for Termux on Android. Practical modules for real mobile workflows.',
-    points: ['Termux-first design', 'Practical red-team tools', 'Lightweight dependencies'],
+      'A phone is a lab if you treat it like one. Hex-pentest is the toolkit I kept reaching for on Termux instead of fighting desktop-only tools.',
+    points: ['Mobile-first modules', 'Less ceremony, more commands', 'Made for practice labs'],
     url: 'https://github.com/BluHExH/Hex-pentest',
   },
   {
     name: 'knitout-3d-visualizer',
-    tag: '3D / Web',
+    tag: 'side quest',
     language: 'TypeScript',
     description:
-      'Interactive 3D knitout visualizer with live code editing. See structure change as you type.',
-    points: ['Live 3D preview', 'Code-driven geometry', 'Deployed on Vercel'],
+      'Not everything has to be security. I wanted to see knitout structures move while I edited code — so I built the viewer.',
+    points: ['Live 3D preview', 'Edit and watch', 'Deployed because shipping beats planning'],
     url: 'https://github.com/BluHExH/knitout-3d-visualizer',
     demo: 'https://knitout-3d-viz.vercel.app',
   },
@@ -34,17 +38,17 @@ const projects = [
     tag: 'OSINT',
     language: 'Python',
     description:
-      'Number-to-location automation for OSINT-style lookups on Termux. Fast CLI path from input to insight.',
-    points: ['OSINT helper', 'Termux friendly', 'Automation focused'],
+      'A small automation for a boring step I kept repeating. Number in, location path out. Built for practice, not for drama.',
+    points: ['CLI first', 'Termux friendly', 'Solves one job well'],
     url: 'https://github.com/BluHExH/HEX-Number-to-location',
   },
   {
     name: 'GitHub-Profile-Builder',
-    tag: 'AI / Platform',
+    tag: 'HEX Forge',
     language: 'TypeScript',
     description:
-      'HEX Forge — AI-powered GitHub profile and README builder. Ship a sharper public presence faster.',
-    points: ['AI-assisted READMEs', 'Profile polish', 'Builder workflow'],
+      'Writing the same README structure over and over is a waste of a night. HEX Forge is me refusing to do that again by hand.',
+    points: ['AI-assisted drafts', 'Profile polish', 'Built from annoyance, shipped for others'],
     url: 'https://github.com/BluHExH/GitHub-Profile-Builder-Platform-',
   },
 ]
@@ -118,7 +122,7 @@ export default function FeaturedScroll() {
               </ul>
               <div className="pin-actions">
                 <a className="btn btn-primary" href={p.url} target="_blank" rel="noopener noreferrer">
-                  View on GitHub →
+                  Open repo →
                 </a>
                 {p.demo && (
                   <a className="btn btn-secondary" href={p.demo} target="_blank" rel="noopener noreferrer">
@@ -139,47 +143,22 @@ export default function FeaturedScroll() {
 }
 
 const css = `
-.pin-section {
-  position: relative;
-  height: 500vh;
-}
+.pin-section { position: relative; height: 500vh; }
 .pin-sticky {
-  position: sticky;
-  top: 0;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  padding: 80px 0 48px;
-  background: transparent;
+  position: sticky; top: 0; min-height: 100vh;
+  display: flex; align-items: center;
+  padding: 80px 0 48px; background: transparent;
 }
 .pin-inner { width: 100%; }
 .pin-stage {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 28px;
-  align-items: stretch;
+  display: grid; grid-template-columns: 220px 1fr; gap: 28px; align-items: stretch;
 }
-.pin-side {
-  display: flex;
-  gap: 14px;
-  align-items: stretch;
-}
-.pin-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex: 1;
-}
+.pin-side { display: flex; gap: 14px; align-items: stretch; }
+.pin-steps { display: flex; flex-direction: column; gap: 8px; flex: 1; }
 .pin-step {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-align: left;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  color: var(--text-muted);
-  transition: all 0.2s ease;
+  display: flex; align-items: center; gap: 10px; text-align: left;
+  padding: 10px 12px; border-radius: 10px; border: 1px solid transparent;
+  color: var(--text-muted); transition: all 0.2s ease;
 }
 .pin-step:hover { color: var(--text); background: rgba(255,255,255,0.03); }
 .pin-step.active {
@@ -189,101 +168,53 @@ const css = `
 }
 .pin-step.done { color: var(--text-secondary); }
 .pin-num {
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--accent);
-  min-width: 22px;
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  color: var(--accent); min-width: 22px;
 }
 .pin-step-name {
-  font-size: 13px;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 13px; font-weight: 600; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
 }
 .pin-bar {
-  width: 3px;
-  border-radius: 99px;
-  background: #262628;
-  position: relative;
-  overflow: hidden;
-  min-height: 180px;
+  width: 3px; border-radius: 99px; background: #262628;
+  position: relative; overflow: hidden; min-height: 180px;
 }
 .pin-bar i {
-  position: absolute;
-  left: 0; top: 0; width: 100%;
+  position: absolute; left: 0; top: 0; width: 100%;
   background: linear-gradient(180deg, #FF5A1F, #FF9A5C);
-  border-radius: 99px;
-  transition: height 0.05s linear;
+  border-radius: 99px; transition: height 0.05s linear;
 }
 .pin-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 32px;
-  box-shadow: var(--shadow);
-  min-height: 340px;
-  display: flex;
-  flex-direction: column;
-  animation: pinIn 0.35s ease;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 18px;
+  padding: 32px; box-shadow: var(--shadow); min-height: 340px;
+  display: flex; flex-direction: column; animation: pinIn 0.35s ease;
 }
 @keyframes pinIn {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: none; }
 }
-.pin-card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
+.pin-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 .pin-tag {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--accent);
-  background: var(--accent-soft);
-  padding: 4px 10px;
-  border-radius: 999px;
+  font-size: 12px; font-weight: 600; color: var(--accent);
+  background: var(--accent-soft); padding: 4px 10px; border-radius: 999px;
 }
-.pin-lang {
-  font-size: 12px;
-  color: var(--text-muted);
-  font-weight: 500;
-}
+.pin-lang { font-size: 12px; color: var(--text-muted); font-weight: 500; }
 .pin-name {
-  font-size: clamp(28px, 4vw, 40px);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  margin: 0 0 14px;
-  color: var(--text);
+  font-size: clamp(28px, 4vw, 40px); font-weight: 800;
+  letter-spacing: -0.03em; margin: 0 0 14px; color: var(--text);
 }
 .pin-desc {
-  font-size: 16px;
-  line-height: 1.7;
-  color: var(--text-secondary);
-  margin: 0 0 18px;
-  max-width: 520px;
+  font-size: 16px; line-height: 1.7; color: var(--text-secondary);
+  margin: 0 0 18px; max-width: 540px;
 }
 .pin-points {
-  margin: 0 0 24px;
-  padding-left: 18px;
-  color: var(--text-secondary);
-  font-size: 14px;
-  line-height: 1.8;
+  margin: 0 0 24px; padding-left: 18px; color: var(--text-secondary);
+  font-size: 14px; line-height: 1.8;
 }
-.pin-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: auto;
-}
+.pin-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: auto; }
 .pin-count {
-  margin-top: 18px;
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--text-muted);
-  letter-spacing: 0.04em;
+  margin-top: 18px; font-family: var(--mono); font-size: 12px;
+  color: var(--text-muted); letter-spacing: 0.04em;
 }
 @media (max-width: 800px) {
   .pin-section { height: 420vh; }

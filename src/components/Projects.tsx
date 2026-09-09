@@ -1,26 +1,83 @@
 import { useInView } from '../hooks/useInView'
 
 const projects = [
-  { name: 'LocalVulnAI', description: 'Local AI-powered vulnerability scanner using Ollama offline.', language: 'Python', stars: 0, url: 'https://github.com/BluHExH/LocalVulnAI', tag: 'AI / Security' },
-  { name: 'Hex-pentest', description: 'EliteHex — penetration testing toolkit for Termux on Android.', language: 'Python', stars: 3, url: 'https://github.com/BluHExH/Hex-pentest', tag: 'Pentest' },
-  { name: 'HEX-Number-to-location', description: 'Number-to-location automation for OSINT-style lookups on Termux.', language: 'Python', stars: 3, url: 'https://github.com/BluHExH/HEX-Number-to-location', tag: 'OSINT' },
-  { name: 'HEX-exploit-maker', description: 'Exploit engine for research, red-team training, and payload analysis.', language: 'Python', stars: 2, url: 'https://github.com/BluHExH/HEX-exploit-maker', tag: 'Research' },
-  { name: 'knitout-3d-visualizer', description: 'Interactive 3D knitout visualizer with live code editing.', language: 'TypeScript', stars: 0, url: 'https://github.com/BluHExH/knitout-3d-visualizer', demo: 'https://knitout-3d-viz.vercel.app', tag: '3D / Web' },
-  { name: 'MediaForge', description: 'Open-source multimedia framework based on FFmpeg.', language: 'C / Python', stars: 0, url: 'https://github.com/BluHExH/MediaForge', tag: 'Multimedia' },
-  { name: 'portfolio', description: 'Personal developer portfolio — dark theme, animated sections.', language: 'TypeScript', stars: 0, url: 'https://github.com/BluHExH/portfolio', demo: 'https://bluhexx.github.io/portfolio/', tag: 'Web' },
-  { name: 'GitHub-Profile-Builder', description: 'HEX Forge — AI-powered GitHub profile and README builder platform.', language: 'TypeScript', stars: 0, url: 'https://github.com/BluHExH/GitHub-Profile-Builder-Platform-', tag: 'AI / Platform' },
+  {
+    name: 'LocalVulnAI',
+    description: 'Needed a scanner that does not phone home. Runs with Ollama, explains findings in plain words.',
+    language: 'Python',
+    stars: 0,
+    url: 'https://github.com/BluHExH/LocalVulnAI',
+    tag: 'built for myself',
+  },
+  {
+    name: 'Hex-pentest',
+    description: 'Pentest helpers that actually fit Termux. Not a 40MB framework — just modules I use.',
+    language: 'Python',
+    stars: 3,
+    url: 'https://github.com/BluHExH/Hex-pentest',
+    tag: 'Termux',
+  },
+  {
+    name: 'HEX-Number-to-location',
+    description: 'Quick number → location path for OSINT practice. CLI first, excuses later.',
+    language: 'Python',
+    stars: 3,
+    url: 'https://github.com/BluHExH/HEX-Number-to-location',
+    tag: 'OSINT',
+  },
+  {
+    name: 'HEX-exploit-maker',
+    description: 'Research playground for payloads and edge cases. For learning, not for random targets.',
+    language: 'Python',
+    stars: 2,
+    url: 'https://github.com/BluHExH/HEX-exploit-maker',
+    tag: 'research',
+  },
+  {
+    name: 'knitout-3d-visualizer',
+    description: 'A 3D visualizer I shipped when I got tired of imagining knit structures in my head.',
+    language: 'TypeScript',
+    stars: 0,
+    url: 'https://github.com/BluHExH/knitout-3d-visualizer',
+    demo: 'https://knitout-3d-viz.vercel.app',
+    tag: 'side quest',
+  },
+  {
+    name: 'MediaForge',
+    description: 'FFmpeg wrapper experiments. Multimedia is messy; this tries to be less messy.',
+    language: 'C / Python',
+    stars: 0,
+    url: 'https://github.com/BluHExH/MediaForge',
+    tag: 'wip',
+  },
+  {
+    name: 'GitHub-Profile-Builder',
+    description: 'HEX Forge — because writing READMEs by hand gets old after the 20th profile.',
+    language: 'TypeScript',
+    stars: 0,
+    url: 'https://github.com/BluHExH/GitHub-Profile-Builder-Platform-',
+    tag: 'platform',
+  },
+  {
+    name: 'portfolio',
+    description: 'This site. Dark, a bit loud, still being shaped by feedback.',
+    language: 'TypeScript',
+    stars: 0,
+    url: 'https://github.com/BluHExH/portfolio',
+    tag: 'meta',
+  },
 ]
 
 const css = `
 .projects-section { overflow: hidden; }
 .slider-wrap {
-  position: relative; margin-top: 40px; overflow: hidden;
+  position: relative; margin-top: 36px; overflow: hidden;
   mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
 }
 .slider-track {
   display: flex; gap: 16px; width: max-content;
-  animation: slideLeft 40s linear infinite;
+  animation: slideLeft 42s linear infinite;
 }
 .slider-track:hover { animation-play-state: paused; }
 @keyframes slideLeft {
@@ -56,7 +113,7 @@ const css = `
   border: 1px solid rgba(74,222,128,0.35); padding: 2px 8px; border-radius: 999px;
 }
 .slide-open { font-size: 12px; font-weight: 600; color: var(--accent); }
-.projects-cta { margin-top: 36px; text-align: center; }
+.projects-cta { margin-top: 36px; text-align: left; }
 @media (max-width: 600px) {
   .slide-card { flex-basis: 260px; width: 260px; }
   .slider-track { animation-duration: 32s; }
@@ -98,9 +155,9 @@ export default function Projects() {
     <section id="projects" className="section projects-section" ref={ref}>
       <div className="container">
         <p className={'section-label reveal' + vis}>Projects</p>
-        <h2 className={'section-title reveal reveal-delay-1' + vis}>Selected work</h2>
+        <h2 className={'section-title reveal reveal-delay-1' + vis}>Things I actually shipped</h2>
         <p className={'section-desc reveal reveal-delay-2' + vis}>
-          Auto-scrolling showcase — hover any card to pause.
+          Hover a card to pause. Some are polished. Some are honest experiments.
         </p>
       </div>
 
@@ -120,7 +177,7 @@ export default function Projects() {
             rel="noopener noreferrer"
             className="btn btn-secondary"
           >
-            See all repositories →
+            Full repo list on GitHub →
           </a>
         </div>
       </div>
